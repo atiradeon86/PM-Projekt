@@ -10,4 +10,4 @@ Set-DnsClientServerAddress -InterfaceIndex $If_index -ServerAddresses ($DC,$Ext_
 
 #Download and run AD Join scripts
 wget https://raw.githubusercontent.com/atiradeon86/PM-Projekt/main/_ad_join.ps1 -OutFile c:\_ad_join.ps1
-iex ./_ad_join.ps1
+iex .\_ad_join.ps1
