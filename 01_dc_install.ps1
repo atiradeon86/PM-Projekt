@@ -8,7 +8,7 @@ $If_index= $interface.InterfaceIndex
    
 Set-DnsClientServerAddress -InterfaceIndex $If_index -ServerAddresses ("$DC_Server_Ip","$External_DNS")
 
-#Install Windows Server Backup Role
+#Install Windows Server Backup Feature
 Install-WindowsFeature Windows-Server-Backup
 
 #Install AD Services + ManagementTools
