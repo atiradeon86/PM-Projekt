@@ -7,11 +7,12 @@ Install-WindowsFeature -Name FS-Data-Deduplication
 #Creating Folders
 $Driver_letter="S"
 
+echo "Creating Folders"
 $folders=@("Hallgatok","Oktatok ","Vizsga","Users")
 foreach ($folder in $folders) {
     New-item -itemtype Directory -path "S:\Shares\$folder"
 }
-
+echo "Creating SMB Shares"
 #Creating SMB Shares
 New-SmbShare -Name "hallgatok" -Path "S:\Shares\Hallgatok"
 New-SmbShare -Name "oktatok" -Path "S:\Shares\Oktatok"
@@ -25,6 +26,7 @@ New-SmbShare -Name "vizsga" -Path "S:\Shares\Vizsga"
 #SMB Grants
 
 #hallgatok
+echo "Set SMB Acces rights"
 Grant-SmbShareAccess -Name hallgatok -AccountName Administrators -AccessRight Full -force
 Grant-SmbShareAccess -Name hallgatok -AccountName hallgatok -AccessRight Change -force
 
@@ -57,6 +59,7 @@ Install-WindowsFeature –Name AD-Domain-Services –IncludeManagementTools
 $names = Get-ADUser -Filter * | Select-Object -ExpandProperty Name
 
 #Creating Quota Template 
+echo "Create Quota Template + Apply"
 New-FsrmQuotaTemplate -Name "Home-Folders" -Description "Limit usage to 500 MB" -Size 500MB -Threshold (New-FsrmQuotaThreshold -Percentage 90)
 
 foreach ($name in $names) {
@@ -78,6 +81,7 @@ $credObject = New-Object System.Management.Automation.PSCredential ($userName, $
 
 Invoke-Command -ComputerName DC1 -Credential $credObject -ScriptBlock {  
 
+echo "Map User Home Folders"
 $OU_List=@("Hallgatok","Oktatok")
 
 foreach ($ou in $OU_List) {
