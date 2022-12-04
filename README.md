@@ -9,7 +9,7 @@ Change your Intial Data in _variables.json
 
 ## Run Auto Deployment:
 
-Run auto_deploy.ps1
+Run deploy.ps1, Press: 4 (Approximately 50 minutes to complete)
 
 ## Run Custom Deployment:
 
