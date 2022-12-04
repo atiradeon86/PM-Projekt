@@ -68,3 +68,5 @@ az vm run-command invoke `
 -n $VM_Name `
 --command-id RunPowerShellScript `
 --scripts "c:\04_scripts.ps1"
+
+Write-Host "W11Client Deployment is finished ... :)" -ForegroundColor Red
