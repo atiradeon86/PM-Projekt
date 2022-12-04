@@ -1,4 +1,4 @@
-﻿New- item - itemtype - directory -path "C:\Logs"
+﻿New-item -itemtype directory -path "C:\Logs"
 Start-Transcript -Path "C:\Logs\04_scripts.txt"
 
 #Setup DNS for AD domain join
