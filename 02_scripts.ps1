@@ -1,7 +1,8 @@
 ﻿Start-Transcript -Path "C:\Logs\02_scripts.txt"
 
 #Get Initial variables from Json
-$Variables = Get-Content "_variables.json" | ConvertFrom-Json
+wget https://raw.githubusercontent.com/atiradeon86/PM-Projekt/main/_variables.json -OutFile c:\_variables.json
+$Variables = Get-Content "c:\_variables.json" | ConvertFrom-Json
 
 $Admin= $Variables.Variable.Admin
 $Password= $Variables.Variable.Password
