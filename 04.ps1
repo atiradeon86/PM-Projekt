@@ -52,8 +52,8 @@ az network nic ip-config update `
 --nic-name $NIC `
 --private-ip-address $Ip
 
-#Download script from Github
-Write-Host "Download scripts from Github (04_scripts.ps1)" -ForegroundColor Red
+#Download scripts from Github
+Write-Host "Download scripts from Github (04_scripts.ps1, _cleanup.ps1)" -ForegroundColor Red
 
 az vm run-command invoke `
    -g $RG `
@@ -67,7 +67,7 @@ az vm run-command invoke `
    --command-id RunPowerShellScript `
    --scripts "wget https://raw.githubusercontent.com/atiradeon86/PM-Projekt/main/_cleanup.ps1 -OutFile c:\_cleanup.ps1"
 
-#Run script
+#Run script 04_scripts.ps1
 Write-Host "Run script: 04_scripts.ps1" -ForegroundColor Red
 az vm run-command invoke `
 -g $RG `
@@ -75,8 +75,8 @@ az vm run-command invoke `
 --command-id RunPowerShellScript `
 --scripts "c:\04_scripts.ps1"
 
-#Run script
-Write-Host "Run script: 04_scripts.ps1" -ForegroundColor Red
+#Run script  _cleanup.ps1
+Write-Host "Run script: _cleanup.ps1" -ForegroundColor Red
 az vm run-command invoke `
 -g $RG `
 -n $VM_Name `
