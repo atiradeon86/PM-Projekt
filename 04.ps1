@@ -14,7 +14,7 @@ $Password= $Variables.Variable.Password
 $VM_Name="W11Client"
 $Public_Ip="pm-projekt-w11-client"
 $Nsg="pm-projekt-nsg"
-$Ip="172.16.0.20"
+$Ip="172.16.0.30"
 
 #Set default ResourceGroup
 az configure --defaults group=$RG
