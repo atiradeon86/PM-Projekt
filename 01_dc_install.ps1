@@ -1,6 +1,6 @@
 ﻿Start-Transcript -Path "C:\Logs\01_dc_install.txt" 
 
-wget https://raw.githubusercontent.com/atiradeon86/PM-Projekt-Testing/main/_variables.json -OutFile c:\01_variables.json
+wget https://raw.githubusercontent.com/atiradeon86/PM-Projekt/main/_variables.json -OutFile c:\01_variables.json
 
 #Get Initial variables from Json
 $Variables = Get-Content "c:\01_variables.json" | ConvertFrom-Json

@@ -7,7 +7,8 @@
     "DC_Server_Ip":"172.16.0.10",
     "Admin":"Demo",
     "Password":"Demo1234####",
-    "Domain":"project.local"
+    "Domain":"project.local",
+    "Default_ADUP":"Demo1234####"
     }
 ]
 }

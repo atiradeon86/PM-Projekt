@@ -1,4 +1,9 @@
-﻿Start-Transcript -Path "C:\Logs\01_dc_ou_users.txt" 
+﻿$Variables = Get-Content "c:\01_variables.json" | ConvertFrom-Json
+$Password= $Variables.Variable.Password
+$Admin= $Variables.Variable.Admin
+$Default_ADUP = $Variables.Variable.Default_ADUP
+
+Start-Transcript -Path "C:\Logs\01_dc_ou_users.txt" 
 
 #Add Organization Units
  $OU_List=@("PROJECT","Hallgatok","Oktatok","KliensGepek","Csoportok")
@@ -8,7 +13,7 @@ foreach ($ou in $OU_List) {
 }
 
 #Default User Password
-$Password = "Demo1234####" | ConvertTo-SecureString -AsPlainText -Force
+$Password = "$Default_ADUP" | ConvertTo-SecureString -AsPlainText -Force
 
 #Add Users to Hallgatok OU
 $Hallgatok_U=@("Gipsz Jakab","Beton Béla")
@@ -82,9 +87,6 @@ Stop-Transcript
 
 #Import Shared-Folders GPO
 # Backup-GPO -Name Shared-Folders -Path C:\ -Comment "Shared Folders"
-
-#Install GPMC with ManagementTools 
-Install-WindowsFeature GPMC -IncludeManagementTools 
 
 #Create GPO
 New-GPO -Name "Shared-Folders"
