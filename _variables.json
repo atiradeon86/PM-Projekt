@@ -1,12 +1,13 @@
 ﻿{
     "Variable": [
     {
-    "RG":"Bryan",
+    "RG":"RG-user06",
     "Vnet":"Bryan-vnet",
     "Subnet":"Bryan-subnet",
     "DC_Server_Ip":"172.16.0.10",
     "Admin":"Demo",
-    "Password":"Demo1234####"
+    "Password":"Demo1234####",
+    "Domain":"project.local"
     }
 ]
 }

@@ -1,4 +1,6 @@
-﻿Install-WindowsFeature -Name DHCP -IncludeManagementTools
+﻿New-item -itemtype directory -path "C:\Logs"
+Start-Transcript -Path "C:\Logs\01_dhcp_role.txt" 
+Install-WindowsFeature -Name DHCP -IncludeManagementTools
 
 netsh dhcp add securitygroups
 Restart-Service dhcpserver
@@ -15,4 +17,4 @@ Set-DhcpServerV4OptionValue -ComputerName project.local -ScopeID 172.16.0.100 -D
 DhcpServerV4Scope
 Get-DhcpServerV4OptionValue
 
-echo "The First part is finished ... :)"
+Stop-Transcript

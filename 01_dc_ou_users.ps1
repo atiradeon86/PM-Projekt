@@ -1,4 +1,6 @@
-﻿#Add Organization Units
+﻿Start-Transcript -Path "C:\Logs\01_dc_ou_users.txt" 
+
+#Add Organization Units
  $OU_List=@("PROJECT","Hallgatok","Oktatok","KliensGepek","Csoportok")
 
 foreach ($ou in $OU_List) {
@@ -10,33 +12,46 @@ $Password = "Demo1234####" | ConvertTo-SecureString -AsPlainText -Force
 
 #Add Users to Hallgatok OU
 $Hallgatok_U=@("Gipsz Jakab","Beton Béla")
+
+
 $Oktatok_U =@("Trainer")
 
 foreach ($U in $Hallgatok_U) {  
-    New-ADUser -Name "$U" -path "OU=hallgatok, DC=project, DC=local" -SamAccountName "$u" -UserPrincipalName "$u" -AccountPassword $Password -Enabled $true
+    $name = "project.local";
+    $Sam = $U.replace(" ",'.').ToLower()
+    $princ = "$U"+"`@$name"
+    $split = $U.split(" ")
+
+    New-ADUser -Name "$U" -path "OU=hallgatok, DC=project, DC=local" -SamAccountName "$Sam" -UserPrincipalName "$princ" -AccountPassword $Password -GivenName $split[0]   -Surname $split[1] -DisplayName "$U" -Enabled $true
 }
 
 #Add User/s to Oktatok OU
-$Oktatok_U =@("Trainer")
+$Oktatok_U =@("Trainer","Ati")
 foreach ($O in $Oktatok_U) {
-    New-ADUser -Name "$O" -path "OU=oktatok, DC=project, DC=local" -SamAccountName "$O" -UserPrincipalName "$O" -AccountPassword $Password -Enabled $true
+    $name = "project.local";
+    $Sam = $O.replace(" ",'.').ToLower()
+    $princ = "$O"+"`@$name"
+    $split = $O.split(" ")
+    New-ADUser -Name "$O" -path "OU=oktatok, DC=project, DC=local" -SamAccountName "$O" -UserPrincipalName "$princ" -AccountPassword $Password -GivenName $split[0]   -Surname $split[1] -DisplayName "$O" -Enabled $true
 }
 
 #Add Trainer to Domain Admins Group
 Add-ADGroupMember -Identity "Domain Admins" -Members Trainer
+Add-ADGroupMember -Identity "Domain Admins" -Members Ati
 
 #Add new ADGroups
 New-ADGroup -Name "oktatok" -SamAccountName "oktatok" -GroupScope DomainLocal -DisplayName "Oktatók" -Path "OU=csoportok,DC=project,DC=local"
 New-ADGroup -Name "hallgatok" -SamAccountName "hallgatok" -GroupScope DomainLocal -DisplayName "Hallgatók" -Path "OU=csoportok,DC=project,DC=local"
 
 #Add users to ADGroups
-Add-ADGroupMember -Identity hallgatok -Members "Gipsz Jakab","Beton Béla"
+Add-ADGroupMember -Identity hallgatok -Members "gipsz.jakab","beton.béla"
 Add-ADGroupMember -Identity oktatok -Members "Trainer"
 
 #BugFix for Shared Folder https://windowsreport.com/folder-doesnt-map/
 
 #Creating the required GPO (Turn Off Fast Logon Optimization feature)
 #Make Backup Backup-GPO -Name FLO-Path C:\ -Comment "Backup GPO FLO"
+#Backup-GPO -Name Shared-Folders -Path C:\ -Comment "Shared Folders"
 #Download
 #Extract
 #Import
@@ -63,3 +78,40 @@ function Unzip
 Unzip "C:\gpo.zip" "C:\"
 
 Import-GPO -BackupGpoName FLO -Path "C:\Gpo" -TargetName FLO
+Stop-Transcript
+
+#Import Shared-Folders GPO
+# Backup-GPO -Name Shared-Folders -Path C:\ -Comment "Shared Folders"
+
+#Install GPMC with ManagementTools 
+Install-WindowsFeature GPMC -IncludeManagementTools 
+
+#Create GPO
+New-GPO -Name "Shared-Folders"
+
+#Link GPO
+New-GPLink -Name "Shared-Folders" -Target "dc=project,dc=local" 
+
+#Download GPO
+wget https://raw.githubusercontent.com/atiradeon86/PM-Projekt/main/Gpo2.zip -OutFile c:\Gpo2.zip
+
+Add-Type -AssemblyName System.IO.Compression.FileSystem
+function Unzip
+{
+    param([string]$zipfile, [string]$outpath)
+    [System.IO.Compression.ZipFile]::ExtractToDirectory($zipfile, $outpath)
+}
+
+Unzip "C:\Gpo2.zip" "C:\"
+
+Import-GPO -BackupGpoName Shared-Folders -Path "C:\Gpo" -TargetName Shared-Folders
+
+Remove-Item -Recurse -Force C:\Gpo
+
+
+#Cleanup
+Remove-Item -Recurse -Force C:\Gpo
+del C:\Gpo.zip
+del C:\Gpo2.zip
+del c:\*.ps1
+del c:\*.json

@@ -1,4 +1,5 @@
-﻿#Add New Zone
+﻿Start-Transcript -Path "C:\Logs\01_dns_role.txt" 
+#Add New Zone
 Add-DnsServerPrimaryZone -Name "bryan-pmproject.hu" -ReplicationScope "Forest" -PassThru
 
 #Add A Records
@@ -15,3 +16,4 @@ $userPassword = 'Demo1234#'
 $secStringPassword = ConvertTo-SecureString $userPassword -AsPlainText -Force
 
 $credObject = New-Object System.Management.Automation.PSCredential ($userName, $secStringPassword)
+Stop-Transcript

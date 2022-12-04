@@ -1,4 +1,13 @@
-﻿#Install FS-Resource-Manager
+﻿Start-Transcript -Path "C:\Logs\02_scripts.txt"
+
+#Get Initial variables from Json
+$Variables = Get-Content "_variables.json" | ConvertFrom-Json
+
+$Admin= $Variables.Variable.Admin
+$Password= $Variables.Variable.Password
+$Domain=$Variables.Variable.Domain
+
+#Install FS-Resource-Manager
 Install-WindowsFeature -Name FS-Resource-Manager –IncludeManagementTools
 
 #Install Data-Deduplication
@@ -7,12 +16,12 @@ Install-WindowsFeature -Name FS-Data-Deduplication
 #Creating Folders
 $Driver_letter="S"
 
-echo "Creating Folders"
+
 $folders=@("Hallgatok","Oktatok ","Vizsga","Users")
 foreach ($folder in $folders) {
     New-item -itemtype Directory -path "S:\Shares\$folder"
 }
-echo "Creating SMB Shares"
+
 #Creating SMB Shares
 New-SmbShare -Name "hallgatok" -Path "S:\Shares\Hallgatok"
 New-SmbShare -Name "oktatok" -Path "S:\Shares\Oktatok"
@@ -26,7 +35,7 @@ New-SmbShare -Name "vizsga" -Path "S:\Shares\Vizsga"
 #SMB Grants
 
 #hallgatok
-echo "Set SMB Acces rights"
+
 Grant-SmbShareAccess -Name hallgatok -AccountName Administrators -AccessRight Full -force
 Grant-SmbShareAccess -Name hallgatok -AccountName hallgatok -AccessRight Change -force
 
@@ -56,10 +65,9 @@ Grant-SmbShareAccess -Name Home -AccountName Administrators -AccessRight Full -f
 Install-WindowsFeature –Name AD-Domain-Services –IncludeManagementTools
 
 #Create home folders + Enable Quota
-$names = Get-ADUser -Filter * | Select-Object -ExpandProperty Name
+$names = Get-ADUser -Filter * | Select-Object -ExpandProperty SamAccountName
 
 #Creating Quota Template 
-echo "Create Quota Template + Apply"
 New-FsrmQuotaTemplate -Name "Home-Folders" -Description "Limit usage to 500 MB" -Size 500MB -Threshold (New-FsrmQuotaThreshold -Percentage 90)
 
 foreach ($name in $names) {
@@ -74,14 +82,14 @@ Get-FsrmQuota
 #Map home folders
 
 #Create Credential Object
-$userName = 'demo@project.local'
-$userPassword = 'Demo1234####'
+$userName = "$Admin@$Domain"
+$userPassword = "$Password"
+
 $secStringPassword = ConvertTo-SecureString $userPassword -AsPlainText -Force
 $credObject = New-Object System.Management.Automation.PSCredential ($userName, $secStringPassword)
 
 Invoke-Command -ComputerName DC1 -Credential $credObject -ScriptBlock {  
 
-echo "Map User Home Folders"
 $OU_List=@("Hallgatok","Oktatok")
 
 foreach ($ou in $OU_List) {
@@ -89,3 +97,7 @@ foreach ($ou in $OU_List) {
 }
 
 }
+#Cleanup
+del c:\*.ps1
+
+Stop-Transcript

@@ -9,9 +9,9 @@ $Admin= $Variables.Variable.Admin
 $Password= $Variables.Variable.Password
 
 #VM Details
-$VM_Name="DC1";
-$Public_Ip="pm-projekt-dc1"
-$Nsg="pm-projekt-nsg";
+$VM_Name="DC1"
+$Public_Ip="PM-Projektdc1"
+$Nsg="PM-Projektnsg"
 
 #Set default ResourceGroup
 az configure --defaults group=$RG
@@ -23,7 +23,7 @@ az network vnet create --name $Vnet `
 --subnet-prefix 172.16.0.0/24
 
 #VM Create
-echo "VM Create: $VM_Name"
+Write-Host "VM Create: $VM_Name" -ForegroundColor Red
 az vm create --name $VM_Name `
 --priority Spot `
 --max-price -1 `
@@ -47,7 +47,7 @@ az vm create --name $VM_Name `
 
 #Change IP to Static on NIC
 $NIC= $VM_Name + "VMNic";
-echo "Change IP to Static($DC_Server_Ip) on $NIC"
+Write-Host "Change IP to Static($DC_Server_Ip) on $NIC"
 $IPConfig= "ipconfig" + $VM_Name
 az network nic ip-config update `
 --name $IPConfig `
@@ -55,8 +55,20 @@ az network nic ip-config update `
 --nic-name $NIC `
 --private-ip-address $DC_Server_Ip
 
+#Enable Icmp on NSG for Test-Netconnection 
+Write-Host "Enable Icmp on NSG fot Test-Netconnection" -ForegroundColor Red
+az network nsg rule create `
+ --nsg-name "$Nsg" `
+ --name "Enable ICMP" `
+ --description "Enable Icmp on NSG fot Test-Netconnection" `
+ --protocol "Icmp" `
+ --direction "Inbound" `
+ --priority "1010" `
+ --destination-port-ranges "*"
+
 #Download scripts from Github
-echo "Download scripts from Github (01_dc_install.ps1, 01_dc_ou_users.ps1, 01_dns.ps1)"
+
+Write-Host "Download scripts from Github (01_dc_install.ps1, 01_dc_ou_users.ps1, 01_dns.ps1, 01_dhcp_role.ps1 )" -ForegroundColor Red
 az vm run-command invoke `
    -g $RG `
    -n $VM_Name `
@@ -81,35 +93,46 @@ az vm run-command invoke `
    --command-id RunPowerShellScript `
    --scripts "wget https://raw.githubusercontent.com/atiradeon86/PM-Projekt/main/01_dhcp_role.ps1 -OutFile c:\01_dhcp_role.ps1"  
 
-echo "DC install"
-echo "Cannot run from powershell ... :( - Force not working with Install-ADDSForest)"
-   
-#The target server will be configured as a domain controller. The server needs to be restarted manually when this
-#operation is complete.
-#Do you want to continue with this operation?
+Write-Host "ADDS DC Install" -ForegroundColor Red
    
 az vm run-command invoke `
    -g $RG `
    -n $VM_Name `
    --command-id RunPowerShellScript `
    --scripts "c:\01_dc_install.ps1"
-   
-echo "DC is currently in installing state ..."
+    
 
-$confirmation = Read-Host "Please confirm that your server booted up after restarting ... [y]"
-if ($confirmation -eq 'y') {
-      
-#Run OU + Users scripts + Shared Folder BugFix GPO
-echo "Run OU + Users scripts + Shared Folder BugFix GPO"
+#Check VM is rebooted?
+$port = "3389"
+
+do {
+   Write-Host "Waiting for reboot" -ForegroundColor Red
+   sleep 3
+   $public_ip= az vm show -d -g $RG -n $VM_Name --query publicIps -o tsv    
+   Write-Host $public_ip
+} until(Test-NetConnection $public_ip -Port 3389 | ? { $_.TcpTestSucceeded} )
+
+#Wait 10 minute after reboot because of AD-Forest Install (Group Policy changes on reboot)
+
+ $Seconds = 600
+ $EndTime = [datetime]::UtcNow.AddSeconds($Seconds)
+ 
+ while (($TimeRemaining = ($EndTime - [datetime]::UtcNow)) -gt 0) {
+   Write-Progress -Activity 'Watiting for...' -Status ADDS... -SecondsRemaining $TimeRemaining.TotalSeconds
+   Start-Sleep 1
+ }
+
+#DHCP Role Install
+Write-Host "DHCP Role Install" -ForegroundColor Red
 
 az vm run-command invoke `
    -g $RG `
    -n $VM_Name `
    --command-id RunPowerShellScript `
-   --scripts "c:\01_dc_ou_users.ps1"
+   --scripts "c:\01_dhcp_role.ps1" 
 
- #Run DNS Scripts
-echo "Run DNS Scripts"
+#Run DNS Scripts
+Write-Host "Run DNS Scripts" -ForegroundColor Red
 
 az vm run-command invoke `
    -g $RG `
@@ -117,13 +140,13 @@ az vm run-command invoke `
    --command-id RunPowerShellScript `
    --scripts "c:\01_dns.ps1"  
 
-#DHCP Role Install
-echo "DHCP Role Install"
+#Run OU + Users scripts + Shared Folder BugFix GPO
+Write-Host "Run OU + Users scripts + Shared Folder BugFix GPO" -ForegroundColor Red
 
 az vm run-command invoke `
    -g $RG `
    -n $VM_Name `
    --command-id RunPowerShellScript `
-   --scripts "c:\01_dhcp_role.ps1"  
+   --scripts "c:\01_dc_ou_users.ps1"
 
-}
+Write-Host "The First part is finished ... :)" -ForegroundColor Green

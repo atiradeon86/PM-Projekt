@@ -1,4 +1,4 @@
-﻿#Gépnév: W10Client
+﻿#VM: W10Client
 #Image: Windows 10 Pro
 
 #Get Initial variables from Json
@@ -11,16 +11,16 @@ $Admin= $Variables.Variable.Admin
 $Password= $Variables.Variable.Password
 
 #VM Details
-$VM_Name="W10Client";
+$VM_Name="W10Client"
 $Public_Ip="pm-projekt-w10-client"
-$Nsg="pm-projekt-nsg";
+$Nsg="pm-projekt-nsg"
 $Ip="172.16.0.20"
 
 #Set default ResourceGroup
 az configure --defaults group=$RG
 
 #VM Create
-echo "VM Create: $VM_Name"
+Write-Host "VM Create: $VM_Name" -ForegroundColor Red
 az vm create --name $VM_Name `
 --priority Spot `
 --max-price -1 `
@@ -44,7 +44,7 @@ az vm create --name $VM_Name `
 
 #Change IP to Static on NIC
 $NIC= $VM_Name + "VMNic";
-echo "Change IP to Static($Ip) on $NIC"
+Write-Host "Change IP to Static($Ip) on $NIC" -ForegroundColor Red
 $IPConfig= "ipconfig" + $VM_Name
 az network nic ip-config update `
 --name $IPConfig `
@@ -53,7 +53,7 @@ az network nic ip-config update `
 --private-ip-address $Ip
 
 #Download script from Github
-echo "Download scripts from Github (03_scripts.ps1)"
+Write-Host "Download scripts from Github (03_scripts.ps1)" -ForegroundColor Red
 
 az vm run-command invoke `
    -g $RG `
@@ -62,11 +62,9 @@ az vm run-command invoke `
    --scripts "wget https://raw.githubusercontent.com/atiradeon86/PM-Projekt/main/03_scripts.ps1 -OutFile c:\03_scripts.ps1"
 
 #Run script
-echo "Run script: 03_scripts.ps1"
+Write-Host "Run script: 03_scripts.ps1" -ForegroundColor Red
 az vm run-command invoke `
 -g $RG `
 -n $VM_Name `
 --command-id RunPowerShellScript `
 --scripts "c:\03_scripts.ps1"
-
-echo "The Final part is finished ... :)"
