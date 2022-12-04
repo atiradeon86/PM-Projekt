@@ -2,7 +2,7 @@
 
 ## Initial Setup
 
-Change your Intial Data in _variables.json
+Change your Initial Settings in _variables.json
 
 
 ### Run az login
