@@ -8,7 +8,8 @@ $Password= $Variables.Variable.Password
 $Admin= $Variables.Variable.Admin
 $Domain=$Variables.Variable.Domain
 
-$Netbios= $Domain.split(".")
+$Netbios= $Domain.split(".")[0]
+
 
 #Data Setup
 $DC_Server_Ip="172.16.0.10"
@@ -66,7 +67,7 @@ Install-ADDSForest `
   -CreateDnsDelegation:$false `
   -DatabasePath "C:\Windows\NTDS" `
   -DomainMode "7" `
-  -DomainNetbiosName "$Netbios[0]" `
+  -DomainNetbiosName "$Netbios" `
   -ForestMode "7" `
   -InstallDns:$true `
   -LogPath "C:\Windows\NTDS" `
