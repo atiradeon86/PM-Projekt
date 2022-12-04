@@ -7,7 +7,8 @@ $Title = 'Bryan Deplyoment Solutions - Always Look on the Bright Side of Life ..
     Write-Host "1: Press '1' for Deploy DC1"
     Write-Host "2: Press '2' for Deploy FS1"
     Write-Host "3: Press '3' for Deploy W10Client"
-    Write-Host "4: Press '4' for Auto Deploy`r`n" -ForegroundColor Red
+    Write-Host "4: Press '4' for Deploy W11Client"
+    Write-Host "5: Press '5' for Auto Deploy`r`n" -ForegroundColor Red
     Write-Host "Q: Press 'Q' to quit.`r`n"
 
 $menu = Read-Host "What you want to do?"
@@ -22,7 +23,10 @@ switch ($menu)
         ./03.ps1
      } '4' {
         ./auto_deploy.ps1
-     }  'q' {
+     } '5' {
+      ./auto_deploy.ps1
+     }
+     'q' {
          return
      }
  }

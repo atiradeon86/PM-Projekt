@@ -9,7 +9,7 @@ Change your Initial Settings in _variables.json
 
 ## Run Auto Deployment:
 
-Run deploy.ps1, Press: 4 (Approximately 50 minutes to complete)
+Run deploy.ps1, Press: 5 (Approximately 50 minutes to complete -W10Client Default)
 
 ## Run Custom Deployment:
 
@@ -20,6 +20,9 @@ Run deploy.ps1
 -Deploy FS1
 
 -Deploy W10Client
+
+-Deploy W11Client
+
 
 # Base Credentials (for testing)
 
