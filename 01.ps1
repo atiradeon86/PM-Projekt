@@ -88,15 +88,15 @@ echo "Cannot run from powershell ... :( - Force not working with Install-ADDSFor
 #operation is complete.
 #Do you want to continue with this operation?
    
-#az vm run-command invoke `
-#   -g $RG `
-#   -n $VM_Name `
-#   --command-id RunPowerShellScript `
-#   --scripts "c:\01_dc_install.ps1"
+az vm run-command invoke `
+   -g $RG `
+   -n $VM_Name `
+   --command-id RunPowerShellScript `
+   --scripts "c:\01_dc_install.ps1"
    
-echo "Please login, and run (WIN+R) the following command: 'powershell c:\01_dc_install.ps1' and press Y"
+echo "DC is currently in installing state ..."
 
-$confirmation = Read-Host "Please confirm you have done it, and server restarting finished ... [y]"
+$confirmation = Read-Host "Please confirm that your server booted up after restarting ... [y]"
 if ($confirmation -eq 'y') {
       
 #Run OU + Users scripts + Shared Folder BugFix GPO
