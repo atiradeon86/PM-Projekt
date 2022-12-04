@@ -16,8 +16,4 @@ wget https://raw.githubusercontent.com/atiradeon86/PM-Projekt/main/_ad_join.ps1 
 
 Invoke-Item (start powershell (c:\_ad_join.ps1))
 
-#Cleanup
-del c:\*.ps1
-del c:\_variables.json
-
 Stop-Transcript

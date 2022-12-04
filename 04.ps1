@@ -61,6 +61,12 @@ az vm run-command invoke `
    --command-id RunPowerShellScript `
    --scripts "wget https://raw.githubusercontent.com/atiradeon86/PM-Projekt/main/04_scripts.ps1 -OutFile c:\04_scripts.ps1"
 
+az vm run-command invoke `
+   -g $RG `
+   -n $VM_Name `
+   --command-id RunPowerShellScript `
+   --scripts "wget https://raw.githubusercontent.com/atiradeon86/PM-Projekt/main/_cleanup.ps1 -OutFile c:\_cleanup.ps1"
+
 #Run script
 Write-Host "Run script: 04_scripts.ps1" -ForegroundColor Red
 az vm run-command invoke `
@@ -68,5 +74,13 @@ az vm run-command invoke `
 -n $VM_Name `
 --command-id RunPowerShellScript `
 --scripts "c:\04_scripts.ps1"
+
+#Run script
+Write-Host "Run script: 04_scripts.ps1" -ForegroundColor Red
+az vm run-command invoke `
+-g $RG `
+-n $VM_Name `
+--command-id RunPowerShellScript `
+--scripts "c:\_cleanup.ps1"
 
 Write-Host "W11Client Deployment is finished ... :)" -ForegroundColor Red
