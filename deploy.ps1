@@ -1,5 +1,5 @@
 
-$Title = 'Bryan Deplyoment Solutions - Always Look on the Bright Side of Life ... '
+$Title = 'Bryan Deployment Solutions - Always Look on the Bright Side of Life ... '
 
     Clear-Host
     Write-Host "======= $Title =======`r`n" -ForegroundColor Green
