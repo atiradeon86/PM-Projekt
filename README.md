@@ -27,5 +27,5 @@ Run deploy.ps1
 # Base Credentials (for testing)
 
 Domain Admin:
-Trainer/Demo
+Trainer/Ati
 Password: Demo1234####
