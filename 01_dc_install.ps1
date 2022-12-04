@@ -6,6 +6,9 @@ wget https://raw.githubusercontent.com/atiradeon86/PM-Projekt/main/_variables.js
 $Variables = Get-Content "c:\01_variables.json" | ConvertFrom-Json
 $Password= $Variables.Variable.Password
 $Admin= $Variables.Variable.Admin
+$Domain=$Variables.Variable.Domain
+
+$Netbios= $Domain.split(".")
 
 #Data Setup
 $DC_Server_Ip="172.16.0.10"
@@ -59,11 +62,11 @@ Install-WindowsFeature –Name AD-Domain-Services –IncludeManagementTools
 $Secure_Pwd = ConvertTo-SecureString $Password -AsPlainText -Force
 
 Install-ADDSForest `
-  -DomainName project.local `
+  -DomainName $Domain `
   -CreateDnsDelegation:$false `
   -DatabasePath "C:\Windows\NTDS" `
   -DomainMode "7" `
-  -DomainNetbiosName "project" `
+  -DomainNetbiosName "$Netbios[0]" `
   -ForestMode "7" `
   -InstallDns:$true `
   -LogPath "C:\Windows\NTDS" `
