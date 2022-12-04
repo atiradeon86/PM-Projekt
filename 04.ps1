@@ -12,7 +12,7 @@ $Password= $Variables.Variable.Password
 
 #VM Details
 $VM_Name="W11Client"
-$Public_Ip="pm-projekt-w10-client"
+$Public_Ip="pm-projekt-w11-client"
 $Nsg="pm-projekt-nsg"
 $Ip="172.16.0.20"
 
