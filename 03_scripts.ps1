@@ -18,5 +18,6 @@ Invoke-Item (start powershell (c:\_ad_join.ps1))
 
 #Cleanup
 del c:\*.ps1
+del c:\01_variables.json
 
 Stop-Transcript

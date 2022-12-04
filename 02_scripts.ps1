@@ -100,5 +100,6 @@ foreach ($ou in $OU_List) {
 }
 #Cleanup
 del c:\*.ps1
-del c:\_variables.json
+del c:\01_variables.json
+
 Stop-Transcript
