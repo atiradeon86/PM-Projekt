@@ -22,7 +22,7 @@ switch ($menu)
      } '3' {
         ./03.ps1
      } '4' {
-        ./auto_deploy.ps1
+        ./04.ps1
      } '5' {
       ./auto_deploy.ps1
      }
