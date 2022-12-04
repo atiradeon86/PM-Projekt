@@ -1,4 +1,4 @@
-# Bryan Deployment Solutions
+# Bryan Azure Deployment Solutions
 
 ### Always Look on the Bright Side of Life ...
 
