@@ -1,7 +1,7 @@
 ﻿{
     "Variable": [
     {
-    "RG":"RG-user06",
+    "RG":"Bryan",
     "Vnet":"Bryan-vnet",
     "Subnet":"Bryan-subnet",
     "DC_Server_Ip":"172.16.0.10",
