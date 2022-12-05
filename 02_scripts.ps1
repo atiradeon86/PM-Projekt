@@ -58,15 +58,20 @@ Grant-SmbShareAccess -Name vizsga -AccountName oktatok -AccessRight Read -force
 #Debug
 Get-SmbShareAccess -Name vizsga
 
-#Create Users Folder Base Share
-New-SmbShare -Name "Home" -Path "S:\Shares\Users"
-Grant-SmbShareAccess -Name Home -AccountName Administrators -AccessRight Full -force
-
 ##Install AD Services + ManagementTools for Powershell modules
 Install-WindowsFeature –Name AD-Domain-Services –IncludeManagementTools
 
 #Create home folders + Enable Quota
 $names = c -Filter * | Select-Object -ExpandProperty SamAccountName
+
+#Creating Quota Template 
+New-FsrmQuotaTemplate -Name "Home-Folders" -Description "Limit usage to 500 MB" -Size 500MB -Threshold (New-FsrmQuotaThreshold -Percentage 90)
+
+foreach ($name in $names) {
+    New-item -itemtype Directory -path S:\Shares\Users\$name
+    $path = "S:\Shares\Users\" +$name
+    New-FsrmQuota -Path $path -Description "Limit usage to 500 MB" -Template "Home-Folders"
+}
 
 #Add NTFS ACL Rights
 foreach ($name in $names) {
@@ -74,15 +79,6 @@ foreach ($name in $names) {
     $ace = New-Object System.Security.Accesscontrol.FileSystemAccessRule ("$name", "Full", "Allow")
     $acl.AddAccessRule($ace)
     Set-Acl -Path "S:\Shares\Users\$name" -AclObject $acl
-}
-
-#Creating Quota Template 
-New-FsrmQuotaTemplate -Name "Home-Folders" -Description "Limit usage to 500 MB" -Size 500MB -Threshold (New-FsrmQuotaThreshold -Percentage 90)
-
-foreach ($name in $names) {
-    New-item -itemtype Directory -path \\FS1\Home\$name
-    $path = "S:\Shares\Users\" +$name
-    New-FsrmQuota -Path $path -Description "Limit usage to 500 MB" -Template "Home-Folders"
 }
 
 #Debug Quota
