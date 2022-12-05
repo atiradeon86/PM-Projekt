@@ -61,6 +61,9 @@ Get-SmbShareAccess -Name vizsga
 #Create Users Folder Base Share
 New-SmbShare -Name "Home" -Path "S:\Shares\Users"
 Grant-SmbShareAccess -Name Home -AccountName Administrators -AccessRight Full -force
+Grant-SmbShareAccess -Name Home -AccountName hallgatok -AccessRight Full -forces
+Grant-SmbShareAccess -Name Home -AccountName oktatok -AccessRight Full -forces
+
 
 ##Install AD Services + ManagementTools for Powershell modules
 Install-WindowsFeature –Name AD-Domain-Services –IncludeManagementTools
