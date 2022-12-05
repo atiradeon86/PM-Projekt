@@ -21,7 +21,7 @@ $DiskName ="pm-project"
 az configure --defaults group=$RG
 
 #VM Create
-Write-Host "VM Create: $VM_Name"
+Write-Host "VM Create: $VM_Name" -ForegroundColor Red
 az vm create --name $VM_Name `
 --priority Spot `
 --max-price -1 `
@@ -44,7 +44,7 @@ az vm create --name $VM_Name `
 --os-disk-delete-option Delete
 
 #Creating new disk
-Write-Host "Creating new disk: $DiskName"
+Write-Host "Creating new disk: $DiskName" -ForegroundColor Red
 az disk create -g $RG -n $DiskName --size-gb 4 --sku StandardSSD_LRS
 
 #Attaching disk to VM
