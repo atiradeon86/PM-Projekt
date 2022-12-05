@@ -62,7 +62,7 @@ Get-SmbShareAccess -Name vizsga
 Install-WindowsFeature –Name AD-Domain-Services –IncludeManagementTools
 
 #Create home folders + Enable Quota
-$names = c -Filter * | Select-Object -ExpandProperty SamAccountName
+$names = Get-ADUser -Filter * | Select-Object -ExpandProperty SamAccountName
 
 #Creating Quota Template 
 New-FsrmQuotaTemplate -Name "Home-Folders" -Description "Limit usage to 500 MB" -Size 500MB -Threshold (New-FsrmQuotaThreshold -Percentage 90)
