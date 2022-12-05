@@ -91,27 +91,6 @@ foreach ($name in $names) {
 #Debug Quota
 Get-FsrmQuota
 
-#Map home folders /* Change Map From GPO */
-
-<#
-#Create Credential Object
-$userName = "$Admin@$Domain"
-$userPassword = "$Password"
-
-$secStringPassword = ConvertTo-SecureString $userPassword -AsPlainText -Force
-$credObject = New-Object System.Management.Automation.PSCredential ($userName, $secStringPassword)
-
-Invoke-Command -ComputerName DC1 -Credential $credObject -ScriptBlock {  
-
-$OU_List=@("Hallgatok","Oktatok")
-
-foreach ($ou in $OU_List) {
-    Get-ADUser -SearchBase "OU=$ou,DC=project,DC=local" -Filter *  | % { Set-ADUser $_ -HomeDrive "Z:" -HomeDirectory ('\\FS1\Home\' + $_.SamAccountName) }  
-}
-
-}
-#>
-
 #Cleanup
 del c:\*.ps1
 del c:\01_variables.json

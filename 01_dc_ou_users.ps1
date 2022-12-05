@@ -31,7 +31,7 @@ foreach ($U in $Hallgatok_U) {
 }
 
 #Add User/s to Oktatok OU
-$Oktatok_U =@("Trainer","Ati")
+$Oktatok_U =@("Trainer","Ati","Horváth Attila")
 foreach ($O in $Oktatok_U) {
     $name = "project.local";
     $Sam = $O.replace(" ",'.').ToLower()
@@ -57,7 +57,7 @@ Add-ADGroupMember -Identity oktatok -Members "trainer"
 
 #Creating the required GPO (Turn Off Fast Logon Optimization feature)
 #Make Backup Backup-GPO -Name FLO-Path C:\ -Comment "Backup GPO FLO"
-#Backup-GPO -Name Shared-Folders -Path C:\ -Comment "Shared Folders"
+
 #Download
 #Extract
 #Import
@@ -108,43 +108,9 @@ function Unzip
 
 Unzip "C:\Gpo2.zip" "C:\"
 
-<#
-
-!!!Item-level-targeting Works with OU, not with Security Groups!!!
-
-#Fix Group SID values for GPO Rule Shared-Folders (For Drive Map Item-level-targeting)
-
-Set-Location C:\Gpo\"{21AA0B2B-97A1-4489-9DE3-E7A1C5FFB6DC}"\DomainSysvol\GPO\User\Preferences\Drives\
-$content = Get-Content -Path ".\drives.xml"
-
-#Get actual SID oktatok
-$oktatok="S-1-5-21-145901427-4149395719-1594107157-1108"
-
-$oktatok_group =Get-ADGroup -Identity oktatok | Select -ExpandProperty SID
-$oktatok_new=$oktatok_group.Value
-
-#Get actual SID hallgatok
-$hallgatok="S-1-5-21-145901427-4149395719-1594107157-1109"
-
-$hallgatok_group =Get-ADGroup -Identity hallgatok | Select -ExpandProperty SID
-$hallgatok_new=$hallgatok_group.Value
-
-#Get actual SID - Domain Admins
-$da="S-1-5-21-145901427-4149395719-1594107157-512"
-
-$da_group =Get-ADGroup -filter * -properties * | select sid,name | Where -property name -eq "Domain Admins"
-$da_new=$da_group.SID.Value
-
-$newContent = $content -replace $oktatok, $oktatok_new  | Out-File -FilePath ".\drives.xml" -Encoding Utf8
-$newContent = $content -replace $hallgatok, $hallgatok_new  | Out-File -FilePath  ".\drives.xml" -Encoding Utf8
-$newContent = $content -replace $da, $da_new  | Out-File -FilePath ".\drives.xml" -Encoding Utf8
-
-Set-Location C:\
-#>
-
 Import-GPO -BackupGpoName Shared-Folders -Path "C:\Gpo" -TargetName Shared-Folders
-Remove-Item -Recurse -Force C:\Gpo
 
+Remove-Item -Recurse -Force C:\Gpo
 
 #Cleanup
 del C:\Gpo.zip
@@ -152,4 +118,4 @@ del C:\Gpo2.zip
 del c:\*.ps1
 del c:\*.json
 
-Stop-Transcriptd
+Stop-Transcript
