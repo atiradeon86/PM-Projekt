@@ -83,7 +83,8 @@ function Unzip
 Unzip "C:\gpo.zip" "C:\"
 
 Import-GPO -BackupGpoName FLO -Path "C:\Gpo" -TargetName FLO
-Stop-Transcript
+
+Remove-Item -Recurse -Force C:\Gpo
 
 #Import Shared-Folders GPO
 # Backup-GPO -Name Shared-Folders -Path C:\ -Comment "Shared Folders"
@@ -141,8 +142,6 @@ Set-Location C:\
 #>
 
 Import-GPO -BackupGpoName Shared-Folders -Path "C:\Gpo" -TargetName Shared-Folders
-
-Remove-Item -Recurse -Force C:\Gpo
 
 #Cleanup
 Remove-Item -Recurse -Force C:\Gpo
