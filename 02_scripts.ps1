@@ -66,14 +66,14 @@ Grant-SmbShareAccess -Name Home -AccountName Administrators -AccessRight Full -f
 Install-WindowsFeature –Name AD-Domain-Services –IncludeManagementTools
 
 #Create home folders + Enable Quota
-$names = Get-ADUser -Filter * | Select-Object -ExpandProperty SamAccountName
+$names = c -Filter * | Select-Object -ExpandProperty SamAccountName
 
 #Add NTFS ACL Rights
 foreach ($name in $names) {
     $acl = Get-Acl -Path "S:\Shares\Users\$name"
     $ace = New-Object System.Security.Accesscontrol.FileSystemAccessRule ("$name", "Full", "Allow")
     $acl.AddAccessRule($ace)
-    Set-Acl -Path "S:\Shares\Users\elek" -AclObject $acl
+    Set-Acl -Path "S:\Shares\Users\$name" -AclObject $acl
 }
 
 #Creating Quota Template 
