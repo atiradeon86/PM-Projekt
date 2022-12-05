@@ -142,9 +142,10 @@ Set-Location C:\
 #>
 
 Import-GPO -BackupGpoName Shared-Folders -Path "C:\Gpo" -TargetName Shared-Folders
+Remove-Item -Recurse -Force C:\Gpo
+
 
 #Cleanup
-Remove-Item -Recurse -Force C:\Gpo
 del C:\Gpo.zip
 del C:\Gpo2.zip
 del c:\*.ps1
