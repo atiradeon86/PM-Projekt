@@ -26,7 +26,6 @@ foreach ($U in $Hallgatok_U) {
     $Sam = $U.replace(" ",'.').ToLower()
     $princ = "$U"+"`@$name"
     $split = $U.split(" ")
-
     New-ADUser -Name "$U" -path "OU=hallgatok, DC=project, DC=local" -SamAccountName "$Sam" -UserPrincipalName "$princ" -AccountPassword $Password -GivenName $split[0]   -Surname $split[1] -DisplayName "$U" -Enabled $true
     Set-ADuser -Identity $Sam -replace @{msnpallowdialin=$true}
 }
