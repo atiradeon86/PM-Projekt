@@ -68,6 +68,14 @@ Install-WindowsFeature –Name AD-Domain-Services –IncludeManagementTools
 #Create home folders + Enable Quota
 $names = Get-ADUser -Filter * | Select-Object -ExpandProperty SamAccountName
 
+#Add NTFS ACL Rights
+foreach ($name in $names) {
+    $acl = Get-Acl -Path "S:\Shares\Users\$name"
+    $ace = New-Object System.Security.Accesscontrol.FileSystemAccessRule ("$name", "Full", "Allow")
+    $acl.AddAccessRule($ace)
+    Set-Acl -Path "S:\Shares\Users\elek" -AclObject $acl
+}
+
 #Creating Quota Template 
 New-FsrmQuotaTemplate -Name "Home-Folders" -Description "Limit usage to 500 MB" -Size 500MB -Threshold (New-FsrmQuotaThreshold -Percentage 90)
 
@@ -80,8 +88,9 @@ foreach ($name in $names) {
 #Debug Quota
 Get-FsrmQuota
 
-#Map home folders
+#Map home folders /* Change Map From GPO */
 
+<#
 #Create Credential Object
 $userName = "$Admin@$Domain"
 $userPassword = "$Password"
@@ -98,6 +107,8 @@ foreach ($ou in $OU_List) {
 }
 
 }
+#>
+
 #Cleanup
 del c:\*.ps1
 del c:\01_variables.json

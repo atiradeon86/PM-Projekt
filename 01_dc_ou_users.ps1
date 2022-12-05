@@ -37,7 +37,7 @@ foreach ($O in $Oktatok_U) {
     $Sam = $O.replace(" ",'.').ToLower()
     $princ = "$O"+"`@$name"
     $split = $O.split(" ")
-    New-ADUser -Name "$O" -path "OU=oktatok, DC=project, DC=local" -SamAccountName "$O" -UserPrincipalName "$princ" -AccountPassword $Password -GivenName $split[0]   -Surname $split[1] -DisplayName "$O" -Enabled $true
+    New-ADUser -Name "$O" -path "OU=oktatok, DC=project, DC=local" -SamAccountName "$Sam" -UserPrincipalName "$princ" -AccountPassword $Password -GivenName $split[0]   -Surname $split[1] -DisplayName "$O" -Enabled $true
 }
 
 #Add Trainer to Domain Admins Group
@@ -50,7 +50,7 @@ New-ADGroup -Name "hallgatok" -SamAccountName "hallgatok" -GroupScope DomainLoca
 
 #Add users to ADGroups
 Add-ADGroupMember -Identity hallgatok -Members "gipsz.jakab","beton.béla"
-Add-ADGroupMember -Identity oktatok -Members "Trainer"
+Add-ADGroupMember -Identity oktatok -Members "trainer"
 
 #BugFix for Shared Folder https://windowsreport.com/folder-doesnt-map/
 
@@ -106,6 +106,10 @@ function Unzip
 
 Unzip "C:\Gpo2.zip" "C:\"
 
+<#
+
+!!!Item-level-targeting Works with OU, not with Security Groups!!!
+
 #Fix Group SID values for GPO Rule Shared-Folders (For Drive Map Item-level-targeting)
 
 Set-Location C:\Gpo\"{21AA0B2B-97A1-4489-9DE3-E7A1C5FFB6DC}"\DomainSysvol\GPO\User\Preferences\Drives\
@@ -134,11 +138,11 @@ $newContent = $content -replace $hallgatok, $hallgatok_new  | Out-File -FilePath
 $newContent = $content -replace $da, $da_new  | Out-File -FilePath ".\drives.xml" -Encoding Utf8
 
 Set-Location C:\
+#>
 
 Import-GPO -BackupGpoName Shared-Folders -Path "C:\Gpo" -TargetName Shared-Folders
 
 Remove-Item -Recurse -Force C:\Gpo
-
 
 #Cleanup
 Remove-Item -Recurse -Force C:\Gpo
