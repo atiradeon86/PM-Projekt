@@ -150,3 +150,5 @@ del C:\Gpo.zip
 del C:\Gpo2.zip
 del c:\*.ps1
 del c:\*.json
+
+Stop-Transcript
