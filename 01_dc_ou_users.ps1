@@ -28,6 +28,7 @@ foreach ($U in $Hallgatok_U) {
     $split = $U.split(" ")
 
     New-ADUser -Name "$U" -path "OU=hallgatok, DC=project, DC=local" -SamAccountName "$Sam" -UserPrincipalName "$princ" -AccountPassword $Password -GivenName $split[0]   -Surname $split[1] -DisplayName "$U" -Enabled $true
+    Set-ADuser -Identity $Sam -replace @{msnpallowdialin=$true}
 }
 
 #Add User/s to Oktatok OU
@@ -38,6 +39,7 @@ foreach ($O in $Oktatok_U) {
     $princ = "$O"+"`@$name"
     $split = $O.split(" ")
     New-ADUser -Name "$O" -path "OU=oktatok, DC=project, DC=local" -SamAccountName "$Sam" -UserPrincipalName "$princ" -AccountPassword $Password -GivenName $split[0]   -Surname $split[1] -DisplayName "$O" -Enabled $true
+    Set-ADuser -Identity $Sam -replace @{msnpallowdialin=$true}
 }
 
 #Add Trainer to Domain Admins Group
@@ -151,4 +153,4 @@ del C:\Gpo2.zip
 del c:\*.ps1
 del c:\*.json
 
-Stop-Transcript
+Stop-Transcriptd
