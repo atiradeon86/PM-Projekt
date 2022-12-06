@@ -81,17 +81,12 @@ foreach ($name in $names) {
 }
 
 #Add NTFS ACL Rights
-
-$names = Get-ADUser -Filter * | Select-Object -ExpandProperty SamAccountName
-
 foreach ($name in $names) {
-    $comp = $comp_name+"\" + $names 
     $acl = Get-Acl -Path "S:\Shares\Users\$name"
-    $ace = New-Object System.Security.Accesscontrol.FileSystemAccessRule ("$comp_name", "Full", "Allow")
+    $ace = New-Object System.Security.Accesscontrol.FileSystemAccessRule ("$name", "Full", "Allow")
     $acl.AddAccessRule($ace)
     Set-Acl -Path "S:\Shares\Users\$name" -AclObject $acl
 }
-
 
 #Debug Quota
 Get-FsrmQuota
