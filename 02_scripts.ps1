@@ -88,6 +88,12 @@ foreach ($name in $names) {
     Set-Acl -Path "S:\Shares\Users\$name" -AclObject $acl
 }
 
+#Create SMB Shares
+foreach ($name in $names) {
+New-SmbShare -Name "$name" -Path "S:\Shares\Users\$name"
+Grant-SmbShareAccess -Name Home -AccountName "$name" -AccessRight Full -force
+}
+
 #Debug Quota
 Get-FsrmQuota
 
