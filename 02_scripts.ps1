@@ -96,17 +96,18 @@ foreach ($name in $names) {
 #>
 
 for ($i=0; $i -lt $names.Length; $i++) {
-$comp_name = $env:computername
-$identity=$comp_name+"\" + $names[$i] 
-$fileSystemRights = "FullControl"
-$type = "Allow"
-$NewAcl = Get-Acl -Path "S:\Shares\Users\$name[$i]"
-# Create new rule
-$fileSystemAccessRuleArgumentList = $identity, $fileSystemRights, $type
-$fileSystemAccessRule = New-Object -TypeName System.Security.AccessControl.FileSystemAccessRule -ArgumentList $fileSystemAccessRuleArgumentList
-# Apply new rule
-$NewAcl.SetAccessRule($fileSystemAccessRule)
-Set-Acl -Path "S:\Shares\Users\$name" -AclObject $NewAcl
+    
+    $comp_name = $env:computername
+    $identity=$comp_name+"\" + $names[$i] 
+    $fileSystemRights = "FullControl"
+    $type = "Allow"
+    $NewAcl = Get-Acl -Path "S:\Shares\Users\$name[$i]"
+    # Create new rule
+    $fileSystemAccessRuleArgumentList = $identity, $fileSystemRights, $type
+    $fileSystemAccessRule = New-Object -TypeName System.Security.AccessControl.FileSystemAccessRule -ArgumentList $fileSystemAccessRuleArgumentList
+    # Apply new rule
+    $NewAcl.SetAccessRule($fileSystemAccessRule)
+    Set-Acl -Path "S:\Shares\Users\$name" -AclObject $NewAcl
 }
 
 #Debug Quota
