@@ -84,8 +84,6 @@ foreach ($name in $names) {
 
 $names = Get-ADUser -Filter * | Select-Object -ExpandProperty SamAccountName
 
-
-<#
 foreach ($name in $names) {
     $comp = $comp_name+"\" + $names 
     $acl = Get-Acl -Path "S:\Shares\Users\$name"
@@ -93,22 +91,7 @@ foreach ($name in $names) {
     $acl.AddAccessRule($ace)
     Set-Acl -Path "S:\Shares\Users\$name" -AclObject $acl
 }
-#>
 
-for ($i=0; $i -lt $names.Length; $i++) {
-    
-    $comp_name = $env:computername
-    $identity=$comp_name+"\" + $names[$i] 
-    $fileSystemRights = "FullControl"
-    $type = "Allow"
-    $NewAcl = Get-Acl -Path "S:\Shares\Users\$name[$i]"
-    # Create new rule
-    $fileSystemAccessRuleArgumentList = $identity, $fileSystemRights, $type
-    $fileSystemAccessRule = New-Object -TypeName System.Security.AccessControl.FileSystemAccessRule -ArgumentList $fileSystemAccessRuleArgumentList
-    # Apply new rule
-    $NewAcl.SetAccessRule($fileSystemAccessRule)
-    Set-Acl -Path "S:\Shares\Users\$name" -AclObject $NewAcl
-}
 
 #Debug Quota
 Get-FsrmQuota
