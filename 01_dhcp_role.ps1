@@ -1,5 +1,6 @@
-﻿New-item -itemtype directory -path "C:\Logs"
-Start-Transcript -Path "C:\Logs\01_dhcp_role.txt" 
+﻿Start-Transcript -Path "C:\Logs\01_dhcp_role.txt" 
+
+#Install DHCP Role
 Install-WindowsFeature -Name DHCP -IncludeManagementTools
 
 netsh dhcp add securitygroups

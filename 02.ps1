@@ -1,20 +1,25 @@
-﻿#VM: FS1
-#Image: Windows Server Core 2019 Gen2
+﻿#VM: FS1 Image:Windows Server Core 2019 Gen2
+
+Start-Transcript -Path "C:\Az-Cli\02.txt" 
+#Variables
+$pwd =  pwd | Select -ExpandProperty Path
 
 #Get Initial variables from Json
-$Variables = Get-Content "_variables.json" | ConvertFrom-Json
+$Variables= Get-Content ".\_variables.json" | ConvertFrom-Json
 
 $RG= $Variables.Variable.RG
 $Vnet= $Variables.Variable.Vnet
 $Subnet= $Variables.Variable.Subnet
+$IPdc1= $Variables.Variable.IP_dc1
+$Domain= $Variables.Variable.Domain
 $Admin= $Variables.Variable.Admin
 $Password= $Variables.Variable.Password
+$Ip = $Variables.Variable.IP_fs1
 
 #VM Details
-$VM_Name="FS1";
+$VM_Name="FS1"
 $Public_Ip="pm-projekt-fs1"
 $Nsg="pm-projekt-nsg"
-$Ip="172.16.0.11"
 $DiskName ="pm-project"
 
 #Set default ResourceGroup
@@ -54,22 +59,6 @@ az vm disk attach `
     --vm-name $VM_Name `
     --name $DiskName 
 
-#Download drive init script from Github
-Write-Host "Download scripts from Github (02_drive_init.ps1)" -ForegroundColor Red
-az vm run-command invoke `
-   -g $RG `
-   -n $VM_Name `
-   --command-id RunPowerShellScript `
-   --scripts "wget https://raw.githubusercontent.com/atiradeon86/PM-Projekt/main/02_drive_init.ps1 -OutFile c:\02_drive_init.ps1"    
-
-#Download DNS Setup script from Github -for AD
-Write-Host "Download scripts from Github (02_dns_setup.ps1)" -ForegroundColor Red
-az vm run-command invoke `
-   -g $RG `
-   -n $VM_Name `
-   --command-id RunPowerShellScript `
-   --scripts "wget https://raw.githubusercontent.com/atiradeon86/PM-Projekt/main/02_dns_setup.ps1 -OutFile c:\02_dns_setup.ps1"    
-
 #Change IP to Static on NIC
 $NIC= $VM_Name + "VMNic";
 Write-Host "Change IP to Static($Ip) on $NIC" -ForegroundColor Red
@@ -85,31 +74,14 @@ Write-Host "Run script: 02_dns_setup.ps1" -ForegroundColor Red
 az vm run-command invoke `
 -g $RG `
 -n $VM_Name `
---command-id RunPowerShellScript `
---scripts "c:\02_dns_setup.ps1"
+--command-id RunPowerShellScript --scripts @$pwd\02_dns_setup.ps1 --parameters "Ip=$Ip" "Dc=$IPdc1"
 
 #Run drive init script
 Write-Host "Run script: 02_drive_init.ps1" -ForegroundColor Red
 az vm run-command invoke `
 -g $RG `
 -n $VM_Name `
---command-id RunPowerShellScript `
---scripts "c:\02_drive_init.ps1"
-
-#Download scripts
-Write-Host "Download scripts from Github (02_scripts.ps1, _ad_join.ps1)" -ForegroundColor Red
-az vm run-command invoke `
-   -g $RG `
-   -n $VM_Name `
-   --command-id RunPowerShellScript `
-   --scripts "wget https://raw.githubusercontent.com/atiradeon86/PM-Projekt/main/02_scripts.ps1 -OutFile c:\02_scripts.ps1"
-
-
-az vm run-command invoke `
-   -g $RG `
-   -n $VM_Name `
-   --command-id RunPowerShellScript `
-   --scripts "wget https://raw.githubusercontent.com/atiradeon86/PM-Projekt/main/_ad_join.ps1 -OutFile c:\_ad_join.ps1"   
+--command-id RunPowerShellScript --scripts @$pwd\02_drive_init.ps1
 
 #Run AD Join script
 Write-Host "Run script: _ad_join.ps1" -ForegroundColor Red
@@ -117,10 +89,10 @@ az vm run-command invoke `
 -g $RG `
 -n $VM_Name `
 --command-id RunPowerShellScript `
---scripts "c:\_ad_join.ps1"
+--scripts @$pwd\_ad_join.ps1 --parameters "Password=$Password" "Domain=$Domain" "Admin=$Admin"
 
-#Wait 5 min (Time to restarting)
-$Seconds = 300
+#Wait 3 min (Time to restarting)
+$Seconds = 180
 $EndTime = [datetime]::UtcNow.AddSeconds($Seconds)
 
 while (($TimeRemaining = ($EndTime - [datetime]::UtcNow)) -gt 0) {
@@ -129,10 +101,9 @@ while (($TimeRemaining = ($EndTime - [datetime]::UtcNow)) -gt 0) {
 }
 
 #Run script (Files Sharing, Folders,Quota)
-Write-Host "Run script: c:\02_scripts.ps1" -ForegroundColor Red
+Write-Host "Run script: 02_scripts.ps1" -ForegroundColor Red
 az vm run-command invoke `
 -g $RG `
 -n $VM_Name `
 --command-id RunPowerShellScript `
---scripts "c:\02_scripts.ps1"
-
+--scripts @$pwd\02_scripts.ps1 --parameters "Domain=$Domain" "Admin=$Admin"

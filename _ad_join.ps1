@@ -1,14 +1,20 @@
-﻿wget https://raw.githubusercontent.com/atiradeon86/PM-Projekt-Testing/main/_variables.json -OutFile c:\01_variables.json
+﻿param(
 
-#Get Initial variables from Json
-$Variables = Get-Content "c:\01_variables.json" | ConvertFrom-Json
-$Password= $Variables.Variable.Password
-$Admin= $Variables.Variable.Admin
-$Domain= $Variables.Variable.Domain
+     [Parameter()]
+     [string]$Password,
+ 
+     [Parameter()]
+     [string]$Admin,
 
-$userPassword = "$Password"
+     [Parameter()]
+     [string]$Domain
+
+ )
+
+$userPassword = $Password
 $userName = "$Admin@$Domain"
+
 $secStringPassword = ConvertTo-SecureString $userPassword -AsPlainText -Force
 $Credential = New-Object -TypeName System.Management.Automation.PSCredential -ArgumentList $UserName,$secStringPassword
 
-Add-Computer -DomainName $domain -DomainCredential $Credential -Restart -Verbose
+Add-Computer -DomainName $Domain -DomainCredential $Credential -Restart -Verbose

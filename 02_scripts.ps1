@@ -1,15 +1,16 @@
-﻿Start-Transcript -Path "C:\Logs\02_scripts.txt"
+﻿param(
+ 
+     [Parameter()]
+     [string]$Domain,
 
-#Get Initial variables from Json
-wget https://raw.githubusercontent.com/atiradeon86/PM-Projekt/main/_variables.json -OutFile c:\_variables.json
-$Variables = Get-Content "c:\_variables.json" | ConvertFrom-Json
+     [Parameter()]
+     [string]$Admin
 
-$Admin= $Variables.Variable.Admin
-$Password= $Variables.Variable.Password
-$Domain=$Variables.Variable.Domain
+ )
+Start-Transcript -Path "C:\Logs\02_scripts.txt"
 
 #Install FS-Resource-Manager
-Install-WindowsFeature -Name FS-Resource-Manager –IncludeManagementTools
+Install-WindowsFeature -Name FS-Resource-Manager -IncludeManagementTools
 
 #Install Data-Deduplication
 Install-WindowsFeature -Name FS-Data-Deduplication
@@ -27,11 +28,6 @@ foreach ($folder in $folders) {
 New-SmbShare -Name "hallgatok" -Path "S:\Shares\Hallgatok"
 New-SmbShare -Name "oktatok" -Path "S:\Shares\Oktatok"
 New-SmbShare -Name "vizsga" -Path "S:\Shares\Vizsga"
-
-#Debug -> Deleting SMB Shares-<
-#Remove-SmbShare -Name "hallgatok" -force
-#Remove-SmbShare -Name "oktatok" -force
-#Remove-SmbShare -Name "vizsga" -force
 
 #SMB Grants
 
@@ -61,12 +57,12 @@ Get-SmbShareAccess -Name vizsga
 #Create Users Folder Base Share
 New-SmbShare -Name "Home" -Path "S:\Shares\Users"
 Grant-SmbShareAccess -Name Home -AccountName Administrators -AccessRight Full -force
-Grant-SmbShareAccess -Name Home -AccountName hallgatok -AccessRight Full -forces
-Grant-SmbShareAccess -Name Home -AccountName oktatok -AccessRight Full -forces
+Grant-SmbShareAccess -Name Home -AccountName hallgatok -AccessRight Full -force
+Grant-SmbShareAccess -Name Home -AccountName oktatok -AccessRight Full -force
 
 
 ##Install AD Services + ManagementTools for Powershell modules
-Install-WindowsFeature –Name AD-Domain-Services –IncludeManagementTools
+Install-WindowsFeature -Name AD-Domain-Services -IncludeManagementTools
 
 #Create home folders + Enable Quota
 $names = Get-ADUser -Filter * | Select-Object -ExpandProperty SamAccountName
@@ -82,23 +78,16 @@ foreach ($name in $names) {
 
 #Add NTFS ACL Rights
 foreach ($name in $names) {
-    $acl = Get-Acl -Path "S:\Shares\Users\$name"
+    $acl = Get-Acl -Path S:\Shares\Users\$name
     $ace = New-Object System.Security.Accesscontrol.FileSystemAccessRule ("$name", "Full", "Allow")
     $acl.AddAccessRule($ace)
-    Set-Acl -Path "S:\Shares\Users\$name" -AclObject $acl
+    Set-Acl -Path S:\Shares\Users\$name -AclObject $acl
 }
 
 #Create SMB Shares
 foreach ($name in $names) {
-New-SmbShare -Name "$name" -Path "S:\Shares\Users\$name"
-Grant-SmbShareAccess -Name Home -AccountName "$name" -AccessRight Full -force
+New-SmbShare -Name $name -Path S:\Shares\Users\$name
+Grant-SmbShareAccess -Name $name -AccountName $name -AccessRight Full -force
 }
-
-#Debug Quota
-Get-FsrmQuota
-
-#Cleanup
-del c:\*.ps1
-del c:\01_variables.json
 
 Stop-Transcript

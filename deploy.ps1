@@ -1,5 +1,5 @@
 
-$Title = 'Bryan Azure Deployment Solutions - Always Look on the Bright Side of Life ... '
+$Title = '[V04] Bryan Azure Deployment Solutions - Always Look on the Bright Side of Life ... '
 
     Clear-Host
     Write-Host "======= $Title =======`r`n" -ForegroundColor Green
@@ -30,4 +30,3 @@ switch ($menu)
          return
      }
  }
-

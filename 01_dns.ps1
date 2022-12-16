@@ -1,4 +1,5 @@
 ﻿Start-Transcript -Path "C:\Logs\01_dns_role.txt" 
+
 #Add New Zone
 Add-DnsServerPrimaryZone -Name "bryan-pmproject.hu" -ReplicationScope "Forest" -PassThru
 

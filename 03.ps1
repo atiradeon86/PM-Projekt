@@ -1,20 +1,23 @@
-﻿#VM: W10Client
-#Image: Windows 10 Pro
+﻿#VM:W10Client Image:Windows 10 Pro
+Start-Transcript -Path "C:\Az-Cli\03.txt"
+$pwd =  pwd | Select -ExpandProperty Path
 
 #Get Initial variables from Json
-$Variables = Get-Content "_variables.json" | ConvertFrom-Json
+$Variables= Get-Content ".\_variables.json" | ConvertFrom-Json
 
 $RG= $Variables.Variable.RG
 $Vnet= $Variables.Variable.Vnet
 $Subnet= $Variables.Variable.Subnet
+$IPdc1= $Variables.Variable.IP_dc1
+$Domain= $Variables.Variable.Domain
 $Admin= $Variables.Variable.Admin
 $Password= $Variables.Variable.Password
+$Ip = $Variables.Variable.IP_w10client
 
 #VM Details
 $VM_Name="W10Client"
 $Public_Ip="pm-projekt-w10-client"
 $Nsg="pm-projekt-nsg"
-$Ip="172.16.0.20"
 
 #Set default ResourceGroup
 az configure --defaults group=$RG
@@ -52,19 +55,18 @@ az network nic ip-config update `
 --nic-name $NIC `
 --private-ip-address $Ip
 
-#Download script from Github
-Write-Host "Download scripts from Github (03_scripts.ps1)" -ForegroundColor Red
-
-az vm run-command invoke `
-   -g $RG `
-   -n $VM_Name `
-   --command-id RunPowerShellScript `
-   --scripts "wget https://raw.githubusercontent.com/atiradeon86/PM-Projekt/main/03_scripts.ps1 -OutFile c:\03_scripts.ps1"
-
-#Run script
+#Run script: 03_scripts.ps1
 Write-Host "Run script: 03_scripts.ps1" -ForegroundColor Red
 az vm run-command invoke `
 -g $RG `
 -n $VM_Name `
+--command-id RunPowerShellScript --scripts @$pwd\03_scripts.ps1 --parameters "Ip=$Ip" "Dc=$IPdc1"
+
+#Run AD Join script
+Write-Host "Run script: _ad_join.ps1" -ForegroundColor Red
+az vm run-command invoke `
+-g $RG `
+-n $VM_Name `
 --command-id RunPowerShellScript `
---scripts "c:\03_scripts.ps1"
+--scripts @$pwd\_ad_join.ps1 --parameters "Password=$Password" "Domain=$Domain" "Admin=$Admin"
+Stop-Transcript

@@ -1,12 +1,18 @@
-﻿#VM: W11Client
-#Image: Windows 11 Pro
+﻿#VM:W11Client Image:Windows 11 Pro
+Start-Transcript -Path "C:\Az-Cli\04.txt"
+
+#Variables
+$pwd =  pwd | Select -ExpandProperty Path
 
 #Get Initial variables from Json
-$Variables = Get-Content "_variables.json" | ConvertFrom-Json
+$Variables= Get-Content ".\_variables.json" | ConvertFrom-Json
 
 $RG= $Variables.Variable.RG
 $Vnet= $Variables.Variable.Vnet
 $Subnet= $Variables.Variable.Subnet
+$IPdc1= $Variables.Variable.IP_dc1
+$Ip = $Variables.Variable.IP_w11client
+$Domain= $Variables.Variable.Domain
 $Admin= $Variables.Variable.Admin
 $Password= $Variables.Variable.Password
 
@@ -14,7 +20,6 @@ $Password= $Variables.Variable.Password
 $VM_Name="W11Client"
 $Public_Ip="pm-projekt-w11-client"
 $Nsg="pm-projekt-nsg"
-$Ip="172.16.0.30"
 
 #Set default ResourceGroup
 az configure --defaults group=$RG
@@ -52,35 +57,19 @@ az network nic ip-config update `
 --nic-name $NIC `
 --private-ip-address $Ip
 
-#Download scripts from Github
-Write-Host "Download scripts from Github (04_scripts.ps1, _cleanup.ps1)" -ForegroundColor Red
-
-az vm run-command invoke `
-   -g $RG `
-   -n $VM_Name `
-   --command-id RunPowerShellScript `
-   --scripts "wget https://raw.githubusercontent.com/atiradeon86/PM-Projekt/main/04_scripts.ps1 -OutFile c:\04_scripts.ps1"
-
-az vm run-command invoke `
-   -g $RG `
-   -n $VM_Name `
-   --command-id RunPowerShellScript `
-   --scripts "wget https://raw.githubusercontent.com/atiradeon86/PM-Projekt/main/_cleanup.ps1 -OutFile c:\_cleanup.ps1"
-
 #Run script 04_scripts.ps1
 Write-Host "Run script: 04_scripts.ps1" -ForegroundColor Red
 az vm run-command invoke `
 -g $RG `
 -n $VM_Name `
---command-id RunPowerShellScript `
---scripts "c:\04_scripts.ps1"
+--command-id RunPowerShellScript --scripts @$pwd\04_scripts.ps1 --parameters "Ip=$Ip" "Dc=$IPdc1"
 
-#Run script  _cleanup.ps1
-Write-Host "Run script: _cleanup.ps1" -ForegroundColor Red
+#Run AD Join script
+Write-Host "Run script: _ad_join.ps1" -ForegroundColor Red
 az vm run-command invoke `
 -g $RG `
 -n $VM_Name `
 --command-id RunPowerShellScript `
---scripts "c:\_cleanup.ps1"
+--scripts @$pwd\_ad_join.ps1 --parameters "Password=$Password" "Domain=$Domain" "Admin=$Admin"
 
-Write-Host "W11Client Deployment is finished ... :)" -ForegroundColor Red
+Stop-Transcript
