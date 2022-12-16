@@ -137,7 +137,7 @@ if (!$check) {
      Write-Progress -Activity 'Watiting for...' -Status ADDS... -SecondsRemaining $TimeRemaining.TotalSeconds
      Start-Sleep 1
    }
-   Write-Host "Trying attempts: $try" -ForegroundColor Red
+   Write-Host "Attempts: $try" -ForegroundColor Red
    Write-Output $cmd 
 }
 
