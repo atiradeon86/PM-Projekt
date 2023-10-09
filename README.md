@@ -6,6 +6,11 @@
 
 Change your Initial Variable Settings in _variables.json
 
+## Install the Azure-cli 
+https://learn.microsoft.com/en-us/cli/azure/install-azure-cli-windows?tabs=azure-cli
+
+x64
+https://aka.ms/installazurecliwindowsx64
 
 ### Run az login
 
